@@ -1,60 +1,66 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <algorithm>
+#include <functional>
 
-using namespace std;
+enum TileType
+{
+	TILETYPE_FLOOR = '.',
+	TILETYPE_GOLD = 'G',
+	TILETYPE_MONSTER = 'M',
+	TILETYPE_START = 'S',
+	TILETYPE_END = 'E'
+};
 
-int genMultiArray(int &arrMap);
-int spawnPlayerAtS();
+struct Player {
+	int x;
+	int y;
+	int goldCount;
+	TileType standingOn;
+};
+
+
+void genMap(std::string mapLocation, std::vector<std::string> &map);
+void getPlayerPosition(Player player, std::vector<std::string> map);
+
+const std::string mapLocation = "./map.txt";
+const std::string playerSymbol = "S";
+const int mapX = 31;
+const int mapY = 10;
 
 int main()
 {
-	string arrMap[10][31];
+	std::vector<std::string> map(mapY);
+	Player player = {0};
 
-	genMultiArray(&arrMap);
-	spawnPlayerAtS();
+	genMap(mapLocation, map);
+	getPlayerPosition(player, map);
 
 	system("pause");
 }
 
-int genMultiArray(int &arrMap) {
-	ifstream inFile;
-	string stringLn;
+void genMap(std::string mapLocation, std::vector<std::string> &map) {
+	std::string line;
+	std::ifstream inFile(mapLocation);
 
-	inFile.open("./map.txt");
+	if (inFile.is_open())
+	{
+		map.clear();
 
-	if (inFile.is_open()) {
-		// Store the map in multidimensional array
-		int rowNo = 0;
-
-		while (getline(inFile, stringLn))
+		while (std::getline(inFile, line))
 		{
-			int charNo = 0;
-
-			for (char& c : stringLn) 
-			{
-				arrMap[rowNo][charNo] = c;
-
-				if (c == 'S')
-				{
-					int playerX = rowNo;
-					int playerY = charNo;
-				}
-
-				charNo++;
-			}
-
-			if (rowNo == 9)
-				return **arrMap;
-
-			rowNo++;
+			map.push_back(line);
 		}
-	}
 
-	inFile.close();
-	return 0;
+		std::cout << "\n";
+	}
 }
 
-int spawnPlayerAtS() {
-	return 1;
+void getPlayerPosition(Player player, std::vector<std::string> map) {
+	for (int i = 0; int i < map.; int i++)
+	{
+
+	}
 }
