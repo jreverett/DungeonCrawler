@@ -32,7 +32,6 @@ void movePlayer(Player &player, std::vector<std::string> &map);
 bool willCollideWithWall(Player& player, std::vector<std::string>& map, int newY, int newX);
 
 const std::string mapLocation = "./map.txt";
-const std::string playerSymbol = "S";
 const int mapX = 31;
 const int mapY = 10;
 
