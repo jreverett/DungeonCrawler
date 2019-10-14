@@ -9,6 +9,7 @@
 
 enum TileType
 {
+	TILETYPE_WALL = '#',
 	TILETYPE_FLOOR = '.',
 	TILETYPE_GOLD = 'G',
 	TILETYPE_MONSTER = 'M',
@@ -29,6 +30,7 @@ void genMap(std::string mapLocation, std::vector<std::string> &map);
 void getPlayerPosition(Player &player, std::vector<std::string> map);
 void renderMap(int playerX, int playerY, std::vector<std::string> &map);
 void movePlayer(Player &player, std::vector<std::string> &map);
+void actionTiles(Player &player, bool &gameEnded);
 bool willCollideWithWall(Player& player, std::vector<std::string>& map, int newY, int newX);
 
 const std::string mapLocation = "./map.txt";
@@ -48,11 +50,9 @@ int main()
 	while (!gameEnded)
 	{
 		movePlayer(player, map);
-		// deal with monsters/gold/etc here
+		actionTiles(player, gameEnded);
 		renderMap(player.x, player.y, map);
 	}
-
-	system("pause");
 }
 
 void genMap(std::string mapLocation, std::vector<std::string> &map) {
@@ -94,10 +94,12 @@ void renderMap(int playerX, int playerY, std::vector<std::string> &map) {
 	map[playerY][playerX] = TILETYPE_PLAYER;
 
 	std::copy(map.begin(), map.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+	std::cout << std::endl;
 }
 
 void movePlayer(Player &player, std::vector<std::string> &map) {
 	char direction = tolower(_getch());
+
 	switch (direction)
 	{
 	case 'w':
@@ -105,6 +107,7 @@ void movePlayer(Player &player, std::vector<std::string> &map) {
 		{
 			map[player.y][player.x] = TILETYPE_FLOOR;
 			player.y--;
+			player.standingOn = (TileType)map[player.y][player.x];
 		}
 		break;
 	case 'a':
@@ -112,6 +115,7 @@ void movePlayer(Player &player, std::vector<std::string> &map) {
 		{
 			map[player.y][player.x] = TILETYPE_FLOOR;
 			player.x--;
+			player.standingOn = (TileType)map[player.y][player.x];
 		}
 		break;
 	case 's':
@@ -120,6 +124,7 @@ void movePlayer(Player &player, std::vector<std::string> &map) {
 		{
 			map[player.y][player.x] = TILETYPE_FLOOR;
 			player.y++;
+			player.standingOn = (TileType)map[player.y][player.x];
 		}
 	}
 		break;
@@ -128,15 +133,38 @@ void movePlayer(Player &player, std::vector<std::string> &map) {
 		{
 			map[player.y][player.x] = TILETYPE_FLOOR;
 			player.x++;
+			player.standingOn = (TileType)map[player.y][player.x];
 		}
 	}
 }
 
-bool willCollideWithWall(Player& player, std::vector<std::string>& map, int newY, int newX) {
+bool willCollideWithWall(Player& player, std::vector<std::string> &map, int newY, int newX) {
 	bool updateY = newY;
 	
 	if (updateY)
-		return map[newY][player.x] == '#';
+		return map[newY][player.x] == TILETYPE_WALL;
 
-	return map[player.y][newX] == '#';
+	return map[player.y][newX] == TILETYPE_WALL;
+}
+
+void actionTiles(Player& player, bool& gameEnded) {
+	switch (player.standingOn)
+	{
+	case TILETYPE_GOLD:
+		player.goldCount++;
+		player.standingOn = TILETYPE_FLOOR;
+		break;
+	case TILETYPE_MONSTER:
+		gameEnded = true;
+		std::cout << "GAME OVER - You've been caught!";
+		std::cout << std::endl;
+		system("pause");
+		break;
+	case TILETYPE_END:
+		gameEnded = true;
+		std::cout << "Level Cleared! You escaped with " << player.goldCount << " gold.";
+		std::cout << std::endl;
+		system("pause");
+		break;
+	}
 }
